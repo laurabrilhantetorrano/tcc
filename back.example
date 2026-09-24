@@ -1,0 +1,13 @@
+# Configuração do Servidor Backend
+PORT=5000
+NODE_ENV=development
+
+# Autenticação JWT
+JWT_SECRET=seu_segredo_jwt_super_seguro_troque_em_producao
+JWT_EXPIRES_IN=7d
+
+# Banco de Dados SQLite
+DATABASE_PATH=./server/data/database.sqlite
+
+# URL do Frontend (CORS)
+CLIENT_URL=http://localhost:5173
