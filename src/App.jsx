@@ -5,57 +5,64 @@ import Cadastro from './Cadastro';
 import Produto from './Produto';
 import Carrinho from './Carrinho';
 import { CarrinhoProvider } from './CarrinhoContext';
+import { AuthProvider } from './AuthContext';
+import GerenciarRoupas from './GerenciarRoupas';
 import SobreNos from './SobreNos';
 import Contato from './Contato';
 import Footer from './Footer';
 
 function FooterCondicional() {
-  const location = useLocation();
+const location = useLocation();
 
-  if (
-    location.pathname === "/login" ||
-    location.pathname === "/cadastro"
-  ) {
-    return null;
-  }
+if (
+location.pathname === "/login" ||
+location.pathname === "/cadastro"
+) {
+return null;
+}
 
-  return <Footer />;
+return <Footer />;
 }
 
 function App() {
-  return (
-    <CarrinhoProvider>
-      <BrowserRouter>
-        <Routes>
+return (
+<AuthProvider>
+<CarrinhoProvider>
+<BrowserRouter>
+<Routes>
 
-          {/* Página inicial */}
-          <Route path="/" element={<Inicio />} />
+{/* Página inicial */}
+<Route path="/" element={<Inicio />} />
 
-          {/* Página de login */}
-          <Route path="/login" element={<Login />} />
+{/* Página de login */}
+<Route path="/login" element={<Login />} />
 
-          {/* Página de cadastro */}
-          <Route path="/cadastro" element={<Cadastro />} />
+{/* Página de cadastro */}
+<Route path="/cadastro" element={<Cadastro />} />
 
-          {/* Página do produto */}
-          <Route path="/produto/:id" element={<Produto />} />
+{/* Gerenciamento de roupas (CRUD) */}
+<Route path="/minhas-roupas" element={<GerenciarRoupas />} />
 
-          {/* Página do carrinho */}
-          <Route path="/carrinho" element={<Carrinho />} />
+{/* Página do produto */}
+<Route path="/produto/:id" element={<Produto />} />
 
-          {/* Página Sobre Nós */}
-          <Route path="/sobre-nos" element={<SobreNos />} />
+{/* Página do carrinho */}
+<Route path="/carrinho" element={<Carrinho />} />
 
-          {/* Página de contato */}
-          <Route path="/contato" element={<Contato />} />
+{/* Página Sobre Nós */}
+<Route path="/sobre-nos" element={<SobreNos />} />
 
-        </Routes>
+{/* Página de contato */}
+<Route path="/contato" element={<Contato />} />
 
-        <FooterCondicional />
+</Routes>
 
-      </BrowserRouter>
-    </CarrinhoProvider>
-  );
+<FooterCondicional />
+
+</BrowserRouter>
+</CarrinhoProvider>
+</AuthProvider>
+);
 }
 
 export default App;
