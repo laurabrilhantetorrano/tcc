@@ -10,50 +10,69 @@ const [senha, setSenha] = useState("");
 
 const [erroEmail, setErroEmail] = useState("");
 const [erroCadastro, setErroCadastro] = useState("");
+const [cadastrando, setCadastrando] = useState(false);
 
 const lidarComCadastro = async (e) => {
 e.preventDefault();
 
 const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Validação do e-mail
 if (!emailValido.test(email)) {
-setErroEmail("Por favor, insira um e-mail válido (ex: nome@email.com).");
+setErroEmail(
+"Por favor, insira um e-mail válido (ex: nome@email.com)."
+);
 return;
 }
 
 setErroEmail("");
 setErroCadastro("");
+setCadastrando(true);
 
 try {
-const resposta = await fetch("http://localhost:5000/api/auth/register", {
+const resposta = await fetch(
+"http://localhost:5000/api/auth/register",
+{
 method: "POST",
 headers: {
 "Content-Type": "application/json",
 },
 body: JSON.stringify({
-username,
-email,
+username: username,
+email: email,
 senha: senha,
 }),
-});
+}
+);
 
 const dados = await resposta.json();
 
 if (!resposta.ok) {
-setErroCadastro(dados.message || "Erro ao realizar cadastro.");
+setErroCadastro(
+dados.error || "Não foi possível realizar o cadastro."
+);
 return;
+}
+
+// Salva o token recebido pelo back-end
+if (dados.token) {
+localStorage.setItem("token", dados.token);
 }
 
 alert("Cadastro realizado com sucesso!");
 
+// Limpa os campos
 setUsername("");
 setEmail("");
 setSenha("");
 } catch (erro) {
-console.error(erro);
+console.error("Erro ao realizar cadastro:", erro);
+
 setErroCadastro(
-"Não foi possível conectar ao servidor. Verifique se o back-end está funcionando."
+"Falha na requisição. Verifique se o servidor está funcionando."
 );
+} finally {
+setCadastrando(false);
 }
 };
 
@@ -66,6 +85,7 @@ return (
 <section className="cadastro-section">
 <div className="boas-vindas-cad">
 <img src={logo} alt="Logo" />
+
 <h2>
 Bem-vindo! Por favor, insira seus dados para criar sua conta.
 </h2>
@@ -75,6 +95,7 @@ Bem-vindo! Por favor, insira seus dados para criar sua conta.
 <h1>Cadastre-se</h1>
 
 <label htmlFor="username">Usuário:</label>
+
 <input
 type="text"
 id="username"
@@ -85,6 +106,7 @@ required
 />
 
 <label htmlFor="email">E-mail:</label>
+
 <input
 type="text"
 id="email"
@@ -92,35 +114,58 @@ name="email"
 value={email}
 onChange={(e) => {
 setEmail(e.target.value);
-if (erroEmail) setErroEmail("");
+
+if (erroEmail) {
+setErroEmail("");
+}
+
+if (erroCadastro) {
+setErroCadastro("");
+}
 }}
 required
 />
 
 {erroEmail && (
-<span className="erro-mensagem">{erroEmail}</span>
+<span className="erro-mensagem">
+{erroEmail}
+</span>
 )}
 
 <label htmlFor="senha">Senha:</label>
+
 <input
 type="password"
 id="senha"
 name="senha"
 value={senha}
-onChange={(e) => setSenha(e.target.value)}
+onChange={(e) => {
+setSenha(e.target.value);
+
+if (erroCadastro) {
+setErroCadastro("");
+}
+}}
 required
 />
 
 {erroCadastro && (
-<span className="erro-mensagem">{erroCadastro}</span>
+<span className="erro-mensagem">
+{erroCadastro}
+</span>
 )}
 
-<button type="submit" className="btn-enviar-cad">
-Cadastrar
+<button
+type="submit"
+className="btn-enviar-cad"
+disabled={cadastrando}
+>
+{cadastrando ? "Cadastrando..." : "Cadastrar"}
 </button>
 
 <p>
-Já tem uma conta? <Link to="/login">Faça login</Link>
+Já tem uma conta?{" "}
+<Link to="/login">Faça login</Link>
 </p>
 </form>
 </section>
