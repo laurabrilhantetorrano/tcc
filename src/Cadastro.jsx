@@ -31,7 +31,7 @@ setCadastrando(true);
 
 try {
 const resposta = await fetch(
-'${import.meta.env.VITE_API_URL}/auth/register',
+ `${import.meta.env.VITE_API_URL}/auth/register`,
 {
 method: "POST",
 headers: {
