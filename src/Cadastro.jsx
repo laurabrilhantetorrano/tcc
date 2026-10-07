@@ -31,7 +31,7 @@ setCadastrando(true);
 
 try {
 const resposta = await fetch(
-"http://tcc-ko7p.onrende.com/api/auth/register",
+'${import.meta.env.VITE_API_URL}/auth/register',
 {
 method: "POST",
 headers: {
