@@ -120,14 +120,6 @@ input:focus {
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-.erro-mensagem {
-  color: #dc2626;
-  font-size: 0.82em;
-  font-weight: 500;
-  margin-top: -12px;
-  margin-bottom: 16px;
-}
-
 .btn-enviar-login {
   background-color: #2563eb;
   color: white;

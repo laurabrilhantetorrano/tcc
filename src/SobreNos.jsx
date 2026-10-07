@@ -3,25 +3,16 @@ import { Link } from 'react-router-dom';
 import {
   CircleUserRound,
   ShoppingCart,
-  Search
+  Search,
+  ArrowLeft
 } from 'lucide-react';
 
 import logo from "./assets/logo.jpg";
 import imagemDona from "./assets/fotodona.jpg";
-import { useCarrinho } from "./CarrinhoContext";
-import { useAuth } from "./AuthContext";
 
 import './SobreNos.css';
 
 export default function SobreNos() {
-  const { carrinho } = useCarrinho();
-  const { user } = useAuth();
-
-  const totalItens = carrinho.reduce(
-    (acc, item) => acc + item.quantidade,
-    0
-  );
-
   return (
     <div className="app">
 
@@ -79,59 +70,20 @@ export default function SobreNos() {
           />
         </div>
 
-        <div className="icons" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <div className="icons">
 
           <Link
             to="/login"
-            style={{
-              color: 'inherit',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              textDecoration: 'none'
-            }}
-            title={user ? `Conectado como ${user.username}` : "Fazer Login"}
+            style={{ color: 'inherit' }}
           >
             <CircleUserRound size={30} />
-            {user && (
-              <span
-                style={{
-                  fontSize: "13px",
-                  color: "white",
-                  fontWeight: "bold",
-                  maxWidth: "90px",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap"
-                }}
-              >
-                {user.username}
-              </span>
-            )}
           </Link>
 
           <Link
             to="/carrinho"
-            style={{ color: 'inherit', position: 'relative' }}
+            style={{ color: 'inherit' }}
           >
             <ShoppingCart size={30} />
-            {totalItens > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-5px",
-                  right: "-8px",
-                  background: "#ff3b30",
-                  color: "white",
-                  borderRadius: "50%",
-                  padding: "2px 6px",
-                  fontSize: "11px",
-                  fontWeight: "bold"
-                }}
-              >
-                {totalItens}
-              </span>
-            )}
           </Link>
 
         </div>

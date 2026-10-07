@@ -5,7 +5,6 @@ import Cadastro from './Cadastro';
 import Produto from './Produto';
 import Carrinho from './Carrinho';
 import { CarrinhoProvider } from './CarrinhoContext';
-import { AuthProvider } from './AuthContext';
 import SobreNos from './SobreNos';
 import Contato from './Contato';
 import Footer from './Footer';
@@ -25,9 +24,8 @@ function FooterCondicional() {
 
 function App() {
   return (
-    <AuthProvider>
-      <CarrinhoProvider>
-        <BrowserRouter>
+    <CarrinhoProvider>
+      <BrowserRouter>
         <Routes>
 
           {/* Página inicial */}
@@ -57,7 +55,6 @@ function App() {
 
       </BrowserRouter>
     </CarrinhoProvider>
-  </AuthProvider>
   );
 }
 

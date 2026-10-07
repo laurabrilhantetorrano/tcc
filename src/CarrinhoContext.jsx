@@ -1,67 +1,35 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
 const CarrinhoContext = createContext();
 
 export function CarrinhoProvider({ children }) {
-  const [carrinho, setCarrinho] = useState(() => {
-    try {
-      const salvo = localStorage.getItem('prebanca_carrinho');
-      return salvo ? JSON.parse(salvo) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('prebanca_carrinho', JSON.stringify(carrinho));
-    } catch {
-      // Ignora erro de gravação
-    }
-  }, [carrinho]);
+  const [carrinho, setCarrinho] = useState([]);
 
   // Adiciona produto ou aumenta a quantidade se já existir
-  const adicionarAoCarrinho = (produto, tamanho = 'M') => {
+  const adicionarAoCarrinho = (produto) => {
     setCarrinho((prev) => {
-      const existe = prev.find((item) => item.id === produto.id && item.tamanho === tamanho);
+      const existe = prev.find((item) => item.id === produto.id);
       if (existe) {
         return prev.map((item) =>
-          item.id === produto.id && item.tamanho === tamanho
-            ? { ...item, quantidade: item.quantidade + 1 }
-            : item
+          item.id === produto.id ? { ...item, quantidade: item.quantidade + 1 } : item
         );
       }
-      return [...prev, { ...produto, tamanho, quantidade: 1 }];
+      return [...prev, { ...produto, quantidade: 1 }];
     });
   };
 
   // Remove o produto do carrinho
-  const removerDoCarrinho = (id, tamanho) => {
-    setCarrinho((prev) =>
-      prev.filter((item) => !(item.id === id && (tamanho ? item.tamanho === tamanho : true)))
-    );
-  };
-
-  // Limpa o carrinho
-  const limparCarrinho = () => {
-    setCarrinho([]);
+  const removerDoCarrinho = (id) => {
+    setCarrinho((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
-    <CarrinhoContext.Provider
-      value={{
-        carrinho,
-        adicionarAoCarrinho,
-        removerDoCarrinho,
-        limparCarrinho
-      }}
-    >
+    <CarrinhoContext.Provider value={{ carrinho, adicionarAoCarrinho, removerDoCarrinho }}>
       {children}
     </CarrinhoContext.Provider>
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useCarrinho() {
   return useContext(CarrinhoContext);
 }
