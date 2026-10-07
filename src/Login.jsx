@@ -1,13 +1,44 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
-// Importando o logo igual você fez no Inicio.jsx
-import logo from "./assets/logo.jpg"; 
+import logo from "./assets/logo.jpg";
+import { useAuth } from "./AuthContext";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const [usuario, setUsuario] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
+
+  const lidarComLogin = async (e) => {
+    e.preventDefault();
+    setErro("");
+
+    if (!usuario.trim() || !senha) {
+      setErro("Preencha o usuário/e-mail e a senha.");
+      return;
+    }
+
+    try {
+      setCarregando(true);
+      await login(usuario.trim(), senha);
+      navigate("/");
+    } catch (err) {
+      if (err?.erro) {
+        setErro(err.erro);
+      } else {
+        setErro("Não foi possível conectar ao servidor. Verifique se o backend está funcionando.");
+      }
+    } finally {
+      setCarregando(false);
+    }
+  };
+
   return (
     <div className="login-page-container">
-      {/* Botão flutuante para voltar para a Home */}
       <Link to="/" className="btn-voltar-home">
         ← Voltar para o Início
       </Link>
@@ -20,23 +51,49 @@ export default function Login() {
           </h2>
         </div>
 
-        <div className="grupo-input">
+        <form className="grupo-input" onSubmit={lidarComLogin}>
           <h1>Login</h1>
-          
+
           <label htmlFor="username">Usuário ou E-mail:</label>
-          <input type="text" id="username" name="username" required />
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={usuario}
+            onChange={(e) => {
+              setUsuario(e.target.value);
+              setErro("");
+            }}
+            required
+          />
 
-          <label htmlFor="password">Senha:</label>
-          <input type="password" id="senha" name="senha" required />
+          <label htmlFor="senha">Senha:</label>
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            value={senha}
+            onChange={(e) => {
+              setSenha(e.target.value);
+              setErro("");
+            }}
+            required
+          />
 
-          <button type="submit" className="btn-enviar-login">
-            Entrar
+          {erro && <span className="erro-mensagem">{erro}</span>}
+
+          <button
+            type="submit"
+            className="btn-enviar-login"
+            disabled={carregando}
+          >
+            {carregando ? "Entrando..." : "Entrar"}
           </button>
-          
+
           <p>
             Não tem uma conta? <Link to="/cadastro">Cadastre-se</Link>
           </p>
-        </div>
+        </form>
       </section>
     </div>
   );

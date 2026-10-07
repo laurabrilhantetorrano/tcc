@@ -1,174 +1,130 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Cadastro.css";
 import logo from "./assets/logo.jpg";
+import { useAuth } from "./AuthContext";
 
 export default function Cadastro() {
-const [username, setUsername] = useState("");
-const [email, setEmail] = useState("");
-const [senha, setSenha] = useState("");
+  const navigate = useNavigate();
+  const { cadastrar } = useAuth();
 
-const [erroEmail, setErroEmail] = useState("");
-const [erroCadastro, setErroCadastro] = useState("");
-const [cadastrando, setCadastrando] = useState(false);
+  const [usuario, setUsuario] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-const lidarComCadastro = async (e) => {
-e.preventDefault();
+  const lidarComCadastro = async (e) => {
+    e.preventDefault();
+    setErro("");
 
-const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Validação do e-mail
-if (!emailValido.test(email)) {
-setErroEmail(
-"Por favor, insira um e-mail válido (ex: nome@email.com)."
-);
-return;
-}
+    if (usuario.trim().length < 2) {
+      setErro("O usuário deve ter pelo menos 2 caracteres.");
+      return;
+    }
 
-setErroEmail("");
-setErroCadastro("");
-setCadastrando(true);
+    if (!emailValido.test(email)) {
+      setErro("Por favor, insira um e-mail válido (ex: nome@email.com).");
+      return;
+    }
 
-try {
-const resposta = await fetch(
- `${import.meta.env.VITE_API_URL}/auth/register`,
-{
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-},
-body: JSON.stringify({
-username: username,
-email: email,
-senha: senha,
-}),
-}
-);
+    if (senha.length < 6) {
+      setErro("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
 
-const dados = await resposta.json();
+    try {
+      setCarregando(true);
+      await cadastrar(usuario.trim(), email.trim(), senha);
+      alert("Cadastro realizado com sucesso!");
+      navigate("/");
+    } catch (err) {
+      if (err?.status === 409) {
+        setErro("Este e-mail já está cadastrado.");
+      } else if (err?.erro) {
+        setErro(err.erro);
+      } else {
+        setErro("Não foi possível conectar ao servidor. Verifique se o backend está funcionando.");
+      }
+    } finally {
+      setCarregando(false);
+    }
+  };
 
-if (!resposta.ok) {
-setErroCadastro(
-dados.error || "Não foi possível realizar o cadastro."
-);
-return;
-}
+  return (
+    <div className="cadastro-page-container">
+      <Link to="/" className="btn-voltar-home-cad">
+        ← Voltar para o Início
+      </Link>
 
-// Salva o token recebido pelo back-end
-if (dados.token) {
-localStorage.setItem("token", dados.token);
-}
+      <section className="cadastro-section">
+        <div className="boas-vindas-cad">
+          <img src={logo} alt="Logo Nana & Mimi" />
+          <h2>
+            Bem-vindo! Por favor, insira seus dados para criar sua conta.
+          </h2>
+        </div>
 
-alert("Cadastro realizado com sucesso!");
+        <form onSubmit={lidarComCadastro} className="grupo-input-cad">
+          <h1>Cadastre-se</h1>
 
-// Limpa os campos
-setUsername("");
-setEmail("");
-setSenha("");
-} catch (erro) {
-console.error("Erro ao realizar cadastro:", erro);
+          <label htmlFor="username">Usuário:</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={usuario}
+            onChange={(e) => {
+              setUsuario(e.target.value);
+              setErro("");
+            }}
+            required
+          />
 
-setErroCadastro(
-"Falha na requisição. Verifique se o servidor está funcionando."
-);
-} finally {
-setCadastrando(false);
-}
-};
+          <label htmlFor="email">E-mail:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErro("");
+            }}
+            required
+          />
 
-return (
-<div className="cadastro-page-container">
-<Link to="/" className="btn-voltar-home-cad">
-← Voltar para o Início
-</Link>
+          <label htmlFor="senha">Senha:</label>
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            value={senha}
+            onChange={(e) => {
+              setSenha(e.target.value);
+              setErro("");
+            }}
+            minLength={6}
+            required
+          />
 
-<section className="cadastro-section">
-<div className="boas-vindas-cad">
-<img src={logo} alt="Logo" />
+          {erro && <span className="erro-mensagem">{erro}</span>}
 
-<h2>
-Bem-vindo! Por favor, insira seus dados para criar sua conta.
-</h2>
-</div>
+          <button
+            type="submit"
+            className="btn-enviar-cad"
+            disabled={carregando}
+          >
+            {carregando ? "Cadastrando..." : "Cadastrar"}
+          </button>
 
-<form onSubmit={lidarComCadastro} className="grupo-input-cad">
-<h1>Cadastre-se</h1>
-
-<label htmlFor="username">Usuário:</label>
-
-<input
-type="text"
-id="username"
-name="username"
-value={username}
-onChange={(e) => setUsername(e.target.value)}
-required
-/>
-
-<label htmlFor="email">E-mail:</label>
-
-<input
-type="text"
-id="email"
-name="email"
-value={email}
-onChange={(e) => {
-setEmail(e.target.value);
-
-if (erroEmail) {
-setErroEmail("");
-}
-
-if (erroCadastro) {
-setErroCadastro("");
-}
-}}
-required
-/>
-
-{erroEmail && (
-<span className="erro-mensagem">
-{erroEmail}
-</span>
-)}
-
-<label htmlFor="senha">Senha:</label>
-
-<input
-type="password"
-id="senha"
-name="senha"
-value={senha}
-onChange={(e) => {
-setSenha(e.target.value);
-
-if (erroCadastro) {
-setErroCadastro("");
-}
-}}
-required
-/>
-
-{erroCadastro && (
-<span className="erro-mensagem">
-{erroCadastro}
-</span>
-)}
-
-<button
-type="submit"
-className="btn-enviar-cad"
-disabled={cadastrando}
->
-{cadastrando ? "Cadastrando..." : "Cadastrar"}
-</button>
-
-<p>
-Já tem uma conta?{" "}
-<Link to="/login">Faça login</Link>
-</p>
-</form>
-</section>
-</div>
-);
+          <p>
+            Já tem uma conta? <Link to="/login">Faça login</Link>
+          </p>
+        </form>
+      </section>
+    </div>
+  );
 }
