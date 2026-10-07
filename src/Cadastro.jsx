@@ -33,7 +33,7 @@ headers: {
 body: JSON.stringify({
 username,
 email,
-password: senha,
+senha: senha,
 }),
 });
 
