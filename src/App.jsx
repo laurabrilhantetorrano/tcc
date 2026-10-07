@@ -5,8 +5,6 @@ import Cadastro from './Cadastro';
 import Produto from './Produto';
 import Carrinho from './Carrinho';
 import { CarrinhoProvider } from './CarrinhoContext';
-import { AuthProvider } from './AuthContext';
-import GerenciarRoupas from './GerenciarRoupas';
 import SobreNos from './SobreNos';
 import Contato from './Contato';
 import Footer from './Footer';
@@ -26,7 +24,6 @@ return <Footer />;
 
 function App() {
 return (
-<AuthProvider>
 <CarrinhoProvider>
 <BrowserRouter>
 <Routes>
@@ -39,9 +36,6 @@ return (
 
 {/* Página de cadastro */}
 <Route path="/cadastro" element={<Cadastro />} />
-
-{/* Gerenciamento de roupas (CRUD) */}
-<Route path="/minhas-roupas" element={<GerenciarRoupas />} />
 
 {/* Página do produto */}
 <Route path="/produto/:id" element={<Produto />} />
@@ -61,7 +55,6 @@ return (
 
 </BrowserRouter>
 </CarrinhoProvider>
-</AuthProvider>
 );
 }
 
